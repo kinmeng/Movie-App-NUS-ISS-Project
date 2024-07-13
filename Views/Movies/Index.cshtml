@@ -1,0 +1,39 @@
+﻿@model IEnumerable<MovieApp.Models.Movie>
+
+@{
+    ViewData["Title"] = "MoviesTest";
+}
+
+<h2>Movies</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Release Date</th>
+            <th>Rating</th>
+            <th>View Reviews</th>
+            <th>Create Reviews</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+        @foreach(var Movie in Model){
+            <tr>
+                <td>@Movie.Title</td>
+                <td>@Movie.ReleaseDate.ToShortDateString()</td>
+                <td>@Movie.Rating</td>
+                    <!-- View Reviews button -->
+                    <td>
+                    <a asp-action="ViewReviews" asp-controller="Review" asp-route-movieId="@Movie.MovieId">View Reviews</a></td>
+                    <td>
+                    <!-- Create Review button -->
+                    <a asp-action="Create" asp-controller="Review" asp-route-movieId="@Movie.MovieId">Create Review</a>
+                    </td>
+
+                </tr>
+
+        }
+        }
+    </tbody>
+</table>

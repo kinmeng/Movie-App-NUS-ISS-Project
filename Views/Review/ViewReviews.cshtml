@@ -1,0 +1,45 @@
+﻿@using System.Linq;
+@model IEnumerable<MovieApp.Models.Review>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<h2>Reviews for Movie</h2>
+<table class="table">
+@if (Model.Any())
+{
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Review</th>
+            <th>Action</th>
+        </tr>
+
+    </thead>
+    <tbody>
+    <tr>
+        
+        @foreach (var review in Model)
+        {
+            <td>@review.UserId</td>
+            <td>@review.Content</td>
+            <!-- Update and delete buttons for each review -->
+            <td><a asp-action="Edit" asp-controller="Review" asp-route-id="@review.Id">Edit</a></td>
+            <td><a asp-action="Delete" asp-controller="Review" asp-route-id="@review.Id">Delete</a></td>
+            @*   </li> *@
+        }
+    </tr>
+    </tbody>
+
+    
+   
+
+   
+}
+else
+{
+    <p>No reviews yet.</p>
+}
+</table>
+
+<a asp-action="Index" asp-controller="Movies">Back to Movies</a>
