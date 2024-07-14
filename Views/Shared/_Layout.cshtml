@@ -10,6 +10,7 @@
     <title>@ViewData["Title"] - Cineverse</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
@@ -37,7 +38,7 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container mt-5 mb-4">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -55,3 +56,10 @@
     @RenderSection("Scripts", required: false)
 </body>
 </html>
+
+@* <style>
+    #bodytemplate{
+        margin:0rem 0rem 0rem 0rem;
+    }
+</style>
+ *@

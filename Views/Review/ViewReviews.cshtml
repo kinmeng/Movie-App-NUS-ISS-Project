@@ -10,32 +10,32 @@
 
 <h2>Reviews for @Model.Movie.Title</h2>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Release Date</th>
-            <th>Rating</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-      
+<div id="movie-section">
+    <table class="table table-striped table-bordered">
+        <thead>
             <tr>
-                <td>@Model.Movie.Title</td>
-                <td>@Model.Movie.ReleaseDate</td>
-                <td>@Model.Movie.Rating</td>
+                <th>Title</th>
+                <th>Release Date</th>
+                <th>Rating</th>
             </tr>
+        </thead>
+        <tbody>
+            @{
+      
+                <tr>
+                    <td>@Model.Movie.Title</td>
+                    <td>@Model.Movie.ReleaseDate</td>
+                    <td>@Model.Movie.Rating</td>
+                </tr>
         
-        }
-    </tbody>
-</table>
-
-
-<table class="table">
-@if (@Model != null)
+            }
+        </tbody>
+    </table>
+</div>
+<div id="review-section">
+@if (@Model.Reviews != null && Model.Reviews.Any())
 {
+        <table id="usertable" class="table table-striped table-bordered">
     <thead>
         <tr>
             <th>User</th>
@@ -49,7 +49,7 @@
         
         @foreach (var @review in @Model.Reviews)
         {
-                <tr>
+           <tr>
             <td>@review.PreferredName</td>
             <td>@review.Content</td>
                     <!-- Update and delete buttons for each review -->
@@ -64,26 +64,52 @@
         }
    
     </tbody>
-
-    
-   
-
-   
+    </table>
 }
 else
 {
-    <p>No reviews yet.</p>
+
+    <p>No reviews yet. Add your first review !</p>
 }
-</table>
+
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <h5>Add a Review</h5>
-    @await Html.PartialAsync("_submitReview", new MovieApp.Models.Review { MovieId = Model.Movie.MovieId })
+   <div class="review-box">
+        <h5>Add a Review</h5>
+        @await Html.PartialAsync("_submitReview", new MovieApp.Models.Review { MovieId = Model.Movie.MovieId })
+    </div>
+
 }
 else
 {
     <p>Please <a asp-area="Identity" asp-page="/Account/Login">login</a> to add a review.</p>
 }
 
-<a asp-action="Index" asp-controller="Movies">Back to Movies</a>
+</div>
+<a id ="back-link" asp-action="Index" asp-controller="Movies">Back to Movies</a>
+
+<style>
+    #usertable{
+        margin-bottom: 1rem;
+    }
+    #back-link{
+        margin-bottom:10rem;
+    }
+    #review-section{
+        margin: 3rem 0rem 3rem 0rem;
+    }
+    #movie-section{
+        margin:0rem;
+    }
+
+    .movie-table th, .movie-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .movie-table {
+        width: 80%;
+        border-collapse: collapse;
+    }
+</style>

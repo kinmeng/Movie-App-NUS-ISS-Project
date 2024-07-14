@@ -149,6 +149,7 @@ namespace MovieApp.Controllers
         }
 
         // GET: Review/Delete/5
+        [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> Delete(int id)
         {
             var review = await _context.Reviews
