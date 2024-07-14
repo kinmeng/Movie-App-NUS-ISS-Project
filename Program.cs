@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using MovieApp.Controllers;
 using MovieApp.Data;
 using MovieApp.Services;
+using MovieApp.Models;
+using Microsoft.Extensions.DependencyInjection;
+using MovieApp.Manager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<IdentityUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
     .AddDefaultUI();
@@ -24,6 +27,7 @@ builder.Services.AddRazorPages(options =>
 builder.Services.Configure<TmdbSettings>(builder.Configuration.GetSection("TmdbSettings"));
 builder.Services.AddHttpClient<MovieService>();
 builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<ApplicationUserManager>();
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddControllers();
@@ -43,6 +47,8 @@ app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
 app.MapRazorPages();
 

@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<MovieApp.Models.Movie>
 
 @{
-    ViewData["Title"] = "MoviesTest";
+    ViewData["Title"] = "Movies";
 }
 
 <h2>Movies</h2>
@@ -13,7 +13,6 @@
             <th>Release Date</th>
             <th>Rating</th>
             <th>View Reviews</th>
-            <th>Create Reviews</th>
         </tr>
     </thead>
     <tbody>
@@ -25,12 +24,24 @@
                 <td>@Movie.Rating</td>
                     <!-- View Reviews button -->
                     <td>
-                    <a asp-action="ViewReviews" asp-controller="Review" asp-route-movieId="@Movie.MovieId">View Reviews</a></td>
-                    <td>
-                    <!-- Create Review button -->
-                    <a asp-action="Create" asp-controller="Review" asp-route-movieId="@Movie.MovieId">Create Review</a>
+                        <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("ViewReviews", "Review", new { movieId = Movie.MovieId })'">
+                            View Reviews
+                        </button>
+                      
                     </td>
+                 @{
+                    // <td>
+                     <!-- Create Review button -->
+                    //  
 
+                     
+                    // //  <a asp-action="Create" asp-controller="Review" asp-route-movieId="@Movie.MovieId" class="btn btn-success" />
+                    // //        Create Review
+                        
+                    // // </td>  
+                    //  }
+                    // }
+                    }
                 </tr>
 
         }

@@ -1,0 +1,32 @@
+﻿@model MovieApp.Models.Review
+
+<h2>Edit Review</h2>
+
+@{
+   var preferredName = ViewData["PreferredName"] ;
+
+}
+
+<form asp-action="Edit">
+    <div class="form-group">
+        <label asp-for="Content" class="control-label"></label>
+        <input asp-for="Content" class="form-control" />
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="MovieId" />
+    <input type="hidden" asp-for="PreferredName" />
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="ViewReviews" asp-route-movieId="@Model.MovieId">Back to Reviews</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

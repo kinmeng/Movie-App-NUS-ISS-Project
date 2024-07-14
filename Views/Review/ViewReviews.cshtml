@@ -1,12 +1,40 @@
 ﻿@using System.Linq;
-@model IEnumerable<MovieApp.Models.Review>
+@model MovieReviewsViewModel
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-<h2>Reviews for Movie</h2>
+    @{
+    var preferredName = ViewData["PreferredName"] as string;
+    }
+
+<h2>Reviews for @Model.Movie.Title</h2>
+
+
 <table class="table">
-@if (Model.Any())
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Release Date</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+      
+            <tr>
+                <td>@Model.Movie.Title</td>
+                <td>@Model.Movie.ReleaseDate</td>
+                <td>@Model.Movie.Rating</td>
+            </tr>
+        
+        }
+    </tbody>
+</table>
+
+
+<table class="table">
+@if (@Model != null)
 {
     <thead>
         <tr>
@@ -17,18 +45,24 @@
 
     </thead>
     <tbody>
-    <tr>
+
         
-        @foreach (var review in Model)
+        @foreach (var @review in @Model.Reviews)
         {
-            <td>@review.UserId</td>
+                <tr>
+            <td>@review.PreferredName</td>
             <td>@review.Content</td>
-            <!-- Update and delete buttons for each review -->
-            <td><a asp-action="Edit" asp-controller="Review" asp-route-id="@review.Id">Edit</a></td>
-            <td><a asp-action="Delete" asp-controller="Review" asp-route-id="@review.Id">Delete</a></td>
-            @*   </li> *@
+                    <!-- Update and delete buttons for each review -->
+                    @if (User.Identity.IsAuthenticated && preferredName == @review.PreferredName)
+                    {
+                        <td>
+                            <a class="btn btn-secondary" asp-action="Edit" asp-controller="Review" asp-route-id="@review.Id">Edit</a>
+                            <a class="btn btn-danger" asp-action="Delete" asp-controller="Review" asp-route-id="@review.Id">Delete</a>
+                        </td>
+                    }
+                </tr>
         }
-    </tr>
+   
     </tbody>
 
     
@@ -41,5 +75,15 @@ else
     <p>No reviews yet.</p>
 }
 </table>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <h5>Add a Review</h5>
+    @await Html.PartialAsync("_submitReview", new MovieApp.Models.Review { MovieId = Model.Movie.MovieId })
+}
+else
+{
+    <p>Please <a asp-area="Identity" asp-page="/Account/Login">login</a> to add a review.</p>
+}
 
 <a asp-action="Index" asp-controller="Movies">Back to Movies</a>

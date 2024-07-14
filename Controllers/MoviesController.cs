@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.Manager;
 using MovieApp.Services;
 
 namespace MovieApp.Controllers
@@ -9,13 +11,19 @@ namespace MovieApp.Controllers
 
         private readonly MovieService _movieService;
 
-        public MoviesController(MovieService movieService)
+        private readonly ApplicationUserManager _userManager;
+        public MoviesController(MovieService movieService, ApplicationUserManager userManager)
         {
+            _userManager = userManager;
             _movieService = movieService;
         }
         //[Route("/Movies")]
         public async Task<IActionResult> Index()
         {
+            var user = HttpContext.User;
+            var preferredName = await _userManager.GetPreferredNameAsync(user);
+            ViewData["PreferredName"] = preferredName;
+
             await _movieService.UpdateMoviesAsync();
             var movies = await _movieService.GetMoviesAsync();
             return View(movies);

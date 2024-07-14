@@ -1,0 +1,43 @@
+﻿@model MovieApp.Models.Review
+
+<form asp-action="Create" asp-controller="Review" method="post" id="reviewForm">
+    <div class="form-group" id="commentBox">
+        <textarea asp-for="Content" class="form-control" placeholder="Write your review here..." required></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="MovieId" />
+    <button type="submit" id="submitButton" class="btn btn-primary">Submit Review</button>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#reviewForm').submit(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        // Optionally, you can add the new review to the list without refreshing
+                        location.reload(); // For simplicity, reload the page
+                    },
+                    error: function(response) {
+                        // Handle error
+                    }
+                });
+            });
+        });
+    
+    </script>
+    }
+
+   <style>
+       #commentBox{
+           margin-bottom:1rem;
+       }
+       #submitButton{
+           margin-top: 1rem !important;
+       }
+   </style>
