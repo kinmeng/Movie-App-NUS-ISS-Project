@@ -6,7 +6,7 @@ Visual Studio 2022
 SQL Server Management Studio
 
 Project setup
-1. Create a new database in SSMS of your preferredName
+1. Create a new database in SSMS of your preferred database name
 2. Setup your appsettings.json with the appropriate credentials - connectionStrings and API Key
 dotnet tool install --global dotnet-ef
 dotnet ef migrations add InitialCreate
