@@ -53,7 +53,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
