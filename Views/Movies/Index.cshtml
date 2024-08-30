@@ -2,19 +2,26 @@
 
 @{
     ViewData["Title"] = "Movies";
+    var currentFilter = ViewData["CurrentFilter"] as string;
+    var currentSort = ViewData["CurrentSort"] as string;
 }
 
 <body id="content">
 <h2>Movies</h2>
-  
-    <p>
-        Sort by:
-        <a asp-action="Index" asp-route-sortOrder="title_desc">Title (Descending)</a> |
-        <a asp-action="Index" asp-route-sortOrder="release_asc">Release Date (Ascending)</a> |
-        <a asp-action="Index" asp-route-sortOrder="release_desc">Release Date (Descending)</a> |
-        <a asp-action="Index" asp-route-sortOrder="rating_asc">Rating (Ascending)</a> |
-        <a asp-action="Index" asp-route-sortOrder="rating_desc">Rating (Descending)</a>
-    </p>
+    <form method="get">
+        <div class="form-group">
+            <input type="text" name="searchString" value="@currentFilter" placeholder="Search by title" />
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+        <div class="form-group">
+            <label>Sort by:</label>
+            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="title_desc">Title (Descending)</a> |
+            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="release_asc">Release Date (Ascending)</a> |
+            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="release_desc">Release Date (Descending)</a> |
+            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="rating_asc">Rating (Ascending)</a> |
+            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="rating_desc">Rating (Descending)</a>
+        </div>
+    </form>
 
 <table class="table" id="movietable">
     <thead>

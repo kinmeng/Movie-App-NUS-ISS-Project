@@ -20,7 +20,7 @@ namespace MovieApp.Controllers
             _movieService = movieService;
         }
         //[Route("/Movies")]
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string searchString, string sortOrder)
         {
             var user = HttpContext.User;
             var preferredName = await _userManager.GetPreferredNameAsync(user);
@@ -28,6 +28,12 @@ namespace MovieApp.Controllers
 
             await _movieService.UpdateMoviesAsync();
             var movies = await _movieService.GetMoviesAsync();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                movies = movies.Where(m => m.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+            }
 
             // Apply sorting based on the sortOrder parameter
             movies = sortOrder switch
@@ -39,6 +45,10 @@ namespace MovieApp.Controllers
                 "rating_desc" => movies.OrderByDescending(m => m.Rating),
                 _ => movies.OrderBy(m => m.Title), // Default sort by title ascending
             };
+
+            // Pass searchString and sortOrder to the view
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentSort"] = sortOrder;
 
             return View(movies.ToList());
         }
