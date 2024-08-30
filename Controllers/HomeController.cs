@@ -32,8 +32,26 @@ namespace MovieApp.Controllers
             return View();
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About()
         {
+            var user = HttpContext.User;
+            var preferredName = await _userManager.GetPreferredNameAsync(user);
+            ViewData["PreferredName"] = preferredName;
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult About(string name, string email, string message)
+        {
+            // Here you would typically process the feedback, e.g., save it to a database or send an email.
+
+            // Log feedback submission
+            //_logger.LogInformation($"Feedback submitted by {name} ({email}): {message}");
+
+            // Indicate that the feedback was successfully sent.
+            ViewBag.FeedbackSent = true;
+
             return View();
         }
 

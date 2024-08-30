@@ -1,7 +1,29 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "About";
 }
 
-<h1>About</h1>
-<p>This page is a simple about us Page</p>
+<h1>About Us</h1>
+<p>Welcome to [Your Website Name], your ultimate destination for all things cinema! Whether you're a film enthusiast, a casual viewer, or just looking for something new to watch, we've got you covered.</p>
+<p>Our team of dedicated reviewers brings you in-depth analyses, honest opinions, and thoughtful critiques on the latest blockbusters, indie gems, and everything in between. We believe that every movie has a story to tell, and we're here to explore those stories with you.</p>
+<p>We don't just review movies; we celebrate the art of filmmaking. From exploring behind-the-scenes insights to discussing the cultural impact of cinema, [Your Website Name] is a community for those who live and breathe movies.</p>
+<p>Thank you for joining us on this cinematic journey. We hope our reviews help you discover your next favorite film!</p>
+
+<hr />
+
+<h2>We'd love to hear from you!</h2>
+
+<form method="post" asp-controller="Home" asp-action="About">
+    <div class="form-group">
+        <label for="name">Your Name:</label>
+        <input type="text" class="form-control" id="name" name="name" required />
+    </div>
+    <div class="form-group">
+        <label for="email">Your Email:</label>
+        <input type="email" class="form-control" id="email" name="email" required />
+    </div>
+    <div class="form-group">
+        <label for="message">Your Feedback:</label>
+        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Feedback</button>
+</form>

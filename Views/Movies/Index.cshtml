@@ -6,6 +6,15 @@
 
 <body id="content">
 <h2>Movies</h2>
+  
+    <p>
+        Sort by:
+        <a asp-action="Index" asp-route-sortOrder="title_desc">Title (Descending)</a> |
+        <a asp-action="Index" asp-route-sortOrder="release_asc">Release Date (Ascending)</a> |
+        <a asp-action="Index" asp-route-sortOrder="release_desc">Release Date (Descending)</a> |
+        <a asp-action="Index" asp-route-sortOrder="rating_asc">Rating (Ascending)</a> |
+        <a asp-action="Index" asp-route-sortOrder="rating_desc">Rating (Descending)</a>
+    </p>
 
 <table class="table" id="movietable">
     <thead>
