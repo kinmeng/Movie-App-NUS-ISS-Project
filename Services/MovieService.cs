@@ -4,6 +4,7 @@ using System.Text.Json;
 using MovieApp.Models;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Data;
+using MovieApp.Interfaces;
 
 namespace MovieApp.Services
 {
@@ -67,6 +68,16 @@ namespace MovieApp.Services
             {
                 return movie;
             }
+        }
+
+        public async Task<IEnumerable<Movie>> SearchMoviesAsync(ISearchStrategy searchStrategy, string searchString)
+        {
+            var movies = await GetMoviesAsync();
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return movies;
+            }
+            return searchStrategy.Search(movies, searchString);
         }
     }
 }

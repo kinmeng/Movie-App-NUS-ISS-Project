@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MovieApp.Interfaces;
 using MovieApp.Manager;
 using MovieApp.Models;
 using MovieApp.Services;
+using NuGet.Protocol.Core.Types;
 
 namespace MovieApp.Controllers
 {
@@ -20,7 +22,7 @@ namespace MovieApp.Controllers
             _movieService = movieService;
         }
         //[Route("/Movies")]
-        public async Task<IActionResult> Index(string searchString, string sortOrder)
+        public async Task<IActionResult> Index(string searchString, string sortOrder, string searchType)
         {
             var user = HttpContext.User;
             var preferredName = await _userManager.GetPreferredNameAsync(user);
@@ -29,11 +31,22 @@ namespace MovieApp.Controllers
             await _movieService.UpdateMoviesAsync();
             var movies = await _movieService.GetMoviesAsync();
 
-            // Apply search filter
-            if (!string.IsNullOrEmpty(searchString))
+            //// Apply search filter
+            //if (!string.IsNullOrEmpty(searchString))
+            //{
+            //    movies = movies.Where(m => m.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+            //}
+
+            // Determine search strategy
+            ISearchStrategy searchStrategy = searchType switch
             {
-                movies = movies.Where(m => m.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase));
-            }
+                "ReleaseDate" => new ReleaseDateSearchStrategy(),
+                _ => new TitleSearchStrategy(), // Default to title search
+            };
+
+            // Apply search strategy
+            movies = await _movieService.SearchMoviesAsync(searchStrategy, searchString);
+
 
             // Apply sorting based on the sortOrder parameter
             movies = sortOrder switch
@@ -49,12 +62,10 @@ namespace MovieApp.Controllers
             // Pass searchString and sortOrder to the view
             ViewData["CurrentFilter"] = searchString;
             ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentSearchType"] = searchType;
 
             return View(movies.ToList());
         }
-        //public string Index()
-        //{
-        //    return "This is my default action...";
-        //
+
     }
 }

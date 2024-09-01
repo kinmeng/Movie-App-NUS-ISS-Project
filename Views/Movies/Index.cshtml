@@ -4,24 +4,41 @@
     ViewData["Title"] = "Movies";
     var currentFilter = ViewData["CurrentFilter"] as string;
     var currentSort = ViewData["CurrentSort"] as string;
+    var currentSearchType = ViewData["CurrentSearchType"] as string; 
+
+    // Function to generate options
+    string GenerateOption(string value, string text)
+    {
+        var selected = currentSearchType == value ? "selected" : "";
+        return $"<option value='{value}' {selected}>{text}</option>";
+    }
 }
 
 <body id="content">
 <h2>Movies</h2>
-    <form method="get">
-        <div class="form-group">
-            <input type="text" name="searchString" value="@currentFilter" placeholder="Search by title" />
-            <button type="submit" class="btn btn-primary">Search</button>
+    <form method="get" class="form-inline">
+        <div class="form-group mb-2">
+            <input type="text" name="searchString" value="@currentFilter" class="form-control mr-2" placeholder="Search" />
         </div>
-        <div class="form-group">
-            <label>Sort by:</label>
-            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="title_desc">Title (Descending)</a> |
-            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="release_asc">Release Date (Ascending)</a> |
-            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="release_desc">Release Date (Descending)</a> |
-            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="rating_asc">Rating (Ascending)</a> |
-            <a asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="rating_desc">Rating (Descending)</a>
+        <div class="form-group mb-2">
+            <select name="searchType" class="form-control">
+                @Html.Raw(GenerateOption("Title", "Search by Title"))
+                @Html.Raw(GenerateOption("ReleaseDate", "Search by Release Date"))
+                <!-- Add more options if needed -->
+            </select>
         </div>
+        <button type="submit" class="btn btn-primary mb-2">Search</button>
     </form>
+    <div class="form-group">
+        <label>Sort by:</label>
+        <div class="btn-group" role="group">
+            <a class="btn btn-secondary" asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="title_desc">Title (Desc)</a>
+            <a class="btn btn-secondary" asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="release_asc">Release Date (Asc)</a>
+            <a class="btn btn-secondary" asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="release_desc">Release Date (Desc)</a>
+            <a class="btn btn-secondary" asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="rating_asc">Rating (Asc)</a>
+            <a class="btn btn-secondary" asp-action="Index" asp-route-searchString="@currentFilter" asp-route-sortOrder="rating_desc">Rating (Desc)</a>
+        </div>
+    </div>
 
 <table class="table" id="movietable">
     <thead>
