@@ -22,3 +22,8 @@ jobs:
             
             - name: Build App
               run: dotnet build MovieApp.csproj -c Release --no-restore
+
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
