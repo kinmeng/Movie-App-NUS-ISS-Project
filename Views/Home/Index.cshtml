@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject SignInManager<ApplicationUser> SignInManager;
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -10,7 +11,10 @@
         <div class="container d-flex flex-column justify-content-center align-items-center">
             <h1 class="display-4">Welcome to Cineverse</h1>
             <p class="lead">Your ultimate community for movie discussions, reviews, and events.</p>
-            <a href="#signup" class="btn btn-primary btn-lg">Join the Community</a>
+            @if (!SignInManager.IsSignedIn(User))
+            {
+                <a href="#signup" class="btn btn-primary btn-lg">Join the Community</a>
+            }
         </div> 
      </section>
 
@@ -63,15 +67,16 @@
         </div>
     </section>
 
-    <section id="signup" class="cta text-center py-5">
-        <div class="container">
-            <h2>Ready to Join the Fun?</h2>
-            <p>Sign up today and become part of our community today!</p>
-            <a href="Identity/Account/register" class="btn btn-primary btn-lg">Sign Up Now</a>
-        </div>
-    </section>
-
-
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <section id="signup" class="cta text-center py-5">
+            <div class="container">
+                <h2>Ready to Join the Fun?</h2>
+                <p>Sign up today and become part of our community today!</p>
+                <a href="Identity/Account/register" class="btn btn-primary btn-lg">Sign Up Now</a>
+            </div>
+        </section>
+    }
 
 </div>
 
