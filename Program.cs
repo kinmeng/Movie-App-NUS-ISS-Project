@@ -31,17 +31,31 @@ builder.Services.AddAWSService<IAmazonSimpleSystemsManagement>();
 builder.Services.AddSingleton<SecretsManagerService>();
 
 var secretsManager = builder.Services.BuildServiceProvider().GetRequiredService<IAmazonSecretsManager>();
-var request = new GetSecretValueRequest { SecretId = "MovieApiConnectionString" };
-var response = await secretsManager.GetSecretValueAsync(request);
-var secrets = new Dictionary<string, string>();
+var databaseRequest = new GetSecretValueRequest { SecretId = "DatabaseConnectionString" };
+var databaseResponse = await secretsManager.GetSecretValueAsync(databaseRequest);
+var databaseSecrets = new Dictionary<string, string>();
 
-if (response.SecretString != null)
+if (databaseResponse.SecretString != null)
 {
-    var secretJson = JsonDocument.Parse(response.SecretString);
+    var secretJson = JsonDocument.Parse(databaseResponse.SecretString);
+    foreach (var kvp in secretJson.RootElement.EnumerateObject())
+    {
+        var dbSettings = kvp.Value.GetString();
+        databaseSecrets[kvp.Name] = dbSettings;
+    }
+}
+
+var movieApiRequest = new GetSecretValueRequest { SecretId = "MovieApiConnectionString" };
+var movieApiResponse = await secretsManager.GetSecretValueAsync(movieApiRequest);
+var movieApiSecrets = new Dictionary<string, string>();
+
+if (movieApiResponse.SecretString != null)
+{
+    var secretJson = JsonDocument.Parse(movieApiResponse.SecretString);
     foreach (var kvp in secretJson.RootElement.EnumerateObject())
     {
         var tmdbSettings = kvp.Value.GetString();
-        secrets[kvp.Name] = tmdbSettings;
+        movieApiSecrets[kvp.Name] = tmdbSettings;
     }
 }
 
@@ -49,8 +63,12 @@ if (response.SecretString != null)
 var configuration = builder.Configuration;
 
 // Update the specific section with the fetched secret
+var databaseConnectionSection = configuration.GetSection("ConnectionStrings");
+var connectionString = databaseSecrets["DefaultConnection"]; 
+databaseConnectionSection["DefaultConnection"] = connectionString;
+
 var tmdbSettingsSection = configuration.GetSection("TmdbSettings");
-var apiKey = secrets["ApiKey"]; 
+var apiKey = movieApiSecrets["ApiKey"]; 
 tmdbSettingsSection["ApiKey"] = apiKey;
 
 // ======   END AWS CONFIGS     ======
