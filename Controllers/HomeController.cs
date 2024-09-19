@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MovieApp.Manager;
 using MovieApp.Models;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace MovieApp.Controllers
 {
@@ -46,8 +47,8 @@ namespace MovieApp.Controllers
         {
             // Here you would typically process the feedback, e.g., save it to a database or send an email.
 
-            // Log feedback submission
-            //_logger.LogInformation($"Feedback submitted by {name} ({email}): {message}");
+            //Log feedback submission
+            _logger.LogInformation($"Feedback submitted by {name} ({email}): {message}");
 
             // Indicate that the feedback was successfully sent.
             ViewBag.FeedbackSent = true;
