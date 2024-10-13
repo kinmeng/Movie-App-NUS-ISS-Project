@@ -12,11 +12,11 @@ namespace MovieApp.Controllers
     public class MoviesController : Controller
     {
 
-        private readonly MovieService _movieService;
+        private readonly IMovieService _movieService;
 
         private readonly ApplicationUserManager _userManager;
 
-        public MoviesController(MovieService movieService, ApplicationUserManager userManager)
+        public MoviesController(IMovieService movieService, ApplicationUserManager userManager)
         {
             _userManager = userManager;
             _movieService = movieService;

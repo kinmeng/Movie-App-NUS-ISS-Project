@@ -20,7 +20,7 @@ namespace MovieApp.Manager
          
         }
 
-        public async Task<string> GetPreferredNameAsync(ClaimsPrincipal user)
+        public virtual async Task<string> GetPreferredNameAsync(ClaimsPrincipal user)
         {
             var appUser = await this.GetUserAsync(user);
             return appUser?.PreferredName;
