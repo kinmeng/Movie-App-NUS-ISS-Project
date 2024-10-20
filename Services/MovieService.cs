@@ -8,7 +8,7 @@ using MovieApp.Interfaces;
 
 namespace MovieApp.Services
 {
-    public class MovieService
+    public class MovieService: IMovieService
     {
 
         private readonly HttpClient _httpClient;

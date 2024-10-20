@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MovieApp.Controllers;
 using MovieApp.Data;
 using MovieApp.Services;
+using MovieApp.Interfaces;
 using MovieApp.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MovieApp.Manager;
@@ -19,57 +20,57 @@ using Amazon.SecretsManager.Model;
 var builder = WebApplication.CreateBuilder(args);
 
 // ======   START AWS CONFIGS   ======
-builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AwsSettings")); // Optionally bind settings to a strongly-typed class
+// builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AwsSettings")); // Optionally bind settings to a strongly-typed class
 
-builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddSingleton<IAmazonSecretsManager>(sp =>
-{
-    return new AmazonSecretsManagerClient(RegionEndpoint.APSoutheast2); // Replace with your preferred region
-});
+// builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+// builder.Services.AddSingleton<IAmazonSecretsManager>(sp =>
+// {
+//     return new AmazonSecretsManagerClient(RegionEndpoint.APSoutheast2); // Replace with your preferred region
+// });
 
-builder.Services.AddAWSService<IAmazonSimpleSystemsManagement>();
-builder.Services.AddSingleton<SecretsManagerService>();
+// builder.Services.AddAWSService<IAmazonSimpleSystemsManagement>();
+// builder.Services.AddSingleton<SecretsManagerService>();
 
-var secretsManager = builder.Services.BuildServiceProvider().GetRequiredService<IAmazonSecretsManager>();
-var databaseRequest = new GetSecretValueRequest { SecretId = "DatabaseConnectionString" };
-var databaseResponse = await secretsManager.GetSecretValueAsync(databaseRequest);
-var databaseSecrets = new Dictionary<string, string>();
+// var secretsManager = builder.Services.BuildServiceProvider().GetRequiredService<IAmazonSecretsManager>();
+// var databaseRequest = new GetSecretValueRequest { SecretId = "DatabaseConnectionString" };
+// var databaseResponse = await secretsManager.GetSecretValueAsync(databaseRequest);
+// var databaseSecrets = new Dictionary<string, string>();
 
-if (databaseResponse.SecretString != null)
-{
-    var secretJson = JsonDocument.Parse(databaseResponse.SecretString);
-    foreach (var kvp in secretJson.RootElement.EnumerateObject())
-    {
-        var dbSettings = kvp.Value.GetString();
-        databaseSecrets[kvp.Name] = dbSettings;
-    }
-}
+// if (databaseResponse.SecretString != null)
+// {
+//     var secretJson = JsonDocument.Parse(databaseResponse.SecretString);
+//     foreach (var kvp in secretJson.RootElement.EnumerateObject())
+//     {
+//         var dbSettings = kvp.Value.GetString();
+//         databaseSecrets[kvp.Name] = dbSettings;
+//     }
+// }
 
-var movieApiRequest = new GetSecretValueRequest { SecretId = "MovieApiConnectionString" };
-var movieApiResponse = await secretsManager.GetSecretValueAsync(movieApiRequest);
-var movieApiSecrets = new Dictionary<string, string>();
+// var movieApiRequest = new GetSecretValueRequest { SecretId = "MovieApiConnectionString" };
+// var movieApiResponse = await secretsManager.GetSecretValueAsync(movieApiRequest);
+// var movieApiSecrets = new Dictionary<string, string>();
 
-if (movieApiResponse.SecretString != null)
-{
-    var secretJson = JsonDocument.Parse(movieApiResponse.SecretString);
-    foreach (var kvp in secretJson.RootElement.EnumerateObject())
-    {
-        var tmdbSettings = kvp.Value.GetString();
-        movieApiSecrets[kvp.Name] = tmdbSettings;
-    }
-}
+// if (movieApiResponse.SecretString != null)
+// {
+//     var secretJson = JsonDocument.Parse(movieApiResponse.SecretString);
+//     foreach (var kvp in secretJson.RootElement.EnumerateObject())
+//     {
+//         var tmdbSettings = kvp.Value.GetString();
+//         movieApiSecrets[kvp.Name] = tmdbSettings;
+//     }
+// }
 
-// Get the existing configuration
-var configuration = builder.Configuration;
+// // Get the existing configuration
+// var configuration = builder.Configuration;
 
-// Update the specific section with the fetched secret
-var databaseConnectionSection = configuration.GetSection("ConnectionStrings");
-var connectionString = databaseSecrets["DefaultConnection"]; 
-databaseConnectionSection["DefaultConnection"] = connectionString;
+// // Update the specific section with the fetched secret
+// var databaseConnectionSection = configuration.GetSection("ConnectionStrings");
+// var connectionString = databaseSecrets["DefaultConnection"]; 
+// databaseConnectionSection["DefaultConnection"] = connectionString;
 
-var tmdbSettingsSection = configuration.GetSection("TmdbSettings");
-var apiKey = movieApiSecrets["ApiKey"]; 
-tmdbSettingsSection["ApiKey"] = apiKey;
+// var tmdbSettingsSection = configuration.GetSection("TmdbSettings");
+// var apiKey = movieApiSecrets["ApiKey"]; 
+// tmdbSettingsSection["ApiKey"] = apiKey;
 
 // ======   END AWS CONFIGS     ======
 
@@ -89,6 +90,7 @@ builder.Services.AddRazorPages(options =>
 builder.Services.Configure<TmdbSettings>(builder.Configuration.GetSection("TmdbSettings"));
 builder.Services.AddHttpClient<MovieService>();
 builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<ApplicationUserManager>();
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
