@@ -27,3 +27,74 @@ jobs:
               uses: SonarSource/sonarcloud-github-action@master
               env:
                 SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build and push
+              uses: docker/build-push-action@v5
+              with:
+                context: ./
+                file: ./Dockerfile
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/movieapp:latest
+
+            - name: Deploy to EC2
+              uses: appleboy/ssh-action@master
+              env:
+                EC2_HOST: ${{ secrets.EC2_HOST_URL }}
+                EC2_USER: ${{ secrets.EC2_USERNAME }}
+                EC2_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+              with:
+                host: ${{ secrets.EC2_HOST_URL }}
+                username: ${{ secrets.EC2_USERNAME }}
+                key: ${{ secrets.SSH_PRIVATE_KEY }}
+                script: |
+                    # Install SSH client
+                    sudo apt-get install -y openssh-client
+
+                    # Setup SSH key
+                    mkdir -p ~/.ssh
+                    echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+                    chmod 600 ~/.ssh/id_rsa
+
+                    # Connect to EC2 and deploy
+                    ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST
+                      # Check if Docker is installed
+                      if ! command -v docker &> /dev/null
+                      then
+                          echo "Docker not found. Installing Docker..."
+                          # Update package index
+                          sudo apt-get update
+
+                          # Install required packages
+                          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+                          # Add Docker’s official GPG key
+                          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+                          # Set up the Docker repository
+                          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+                          # Install Docker
+                          sudo apt-get update
+                          sudo apt-get install -y docker-ce
+                      else
+                          echo "Docker is already installed."
+                      fi
+
+                      # Update Docker image
+                      docker pull ${{ secrets.DOCKERHUB_USERNAME }}/movieapp:latest
+
+                      # Stop and remove the old container if it exists
+                      docker stop movieapp || true
+                      docker rm movieapp || true
+
+                      # Run the new container
+                      docker run -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -d --name movieapp -p 8080:8080 -p 8081:8081 ${{ secrets.DOCKERHUB_USERNAME }}/movieapp:latest
