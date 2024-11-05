@@ -6,13 +6,12 @@ Visual Studio 2022
 SQL Server Management Studio
 
 Project setup
-1. Create a new database in SSMS of your preferred database name
-2. Setup your appsettings.json with the appropriate credentials - connectionStrings and API Key
+1. Clone the project
+2. Create a new database in SSMS of your preferred database name
+3. Setup your `appsettings.json` with the appropriate credentials - connectionStrings and API Key
+4. Run these commands <br />
+  ```dotnet tool install --global dotnet-ef``` <br />
+  ```dotnet ef migrations add InitialCreate``` (optional) <br />
+  ```dotnet ef database update``` <br />
 
-
-  <b>Run these commands</b> <br />
-  dotnet tool install --global dotnet-ef <br />
-  dotnet ef migrations add InitialCreate <br />
-  dotnet ef database update <br />
-
-3. Try running the project 
+5. Try running the project (IIS Express)
