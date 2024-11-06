@@ -1,28 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieApp.Controllers;
 using MovieApp.Data;
+using MovieApp.Interfaces;
 using MovieApp.Models;
 using System.Net.Http;
 using System.Text.Json;
 
 namespace MovieApp.Repositories
 {
-    public interface IMovieRepository
-    {
-        Task UpdateMoviesAsync(IEnumerable<Movie> moviesFromApi);
-        Task<Movie> GetMovieByIdAsync(int movieId);
-    }
+    
     public class MovieRepository: IMovieRepository
     {
-        private readonly HttpClient _httpClient;
-        private readonly TmdbSettings _settings;
         private readonly ApplicationDbContext _context;
 
-        public MovieRepository(ApplicationDbContext context, HttpClient httpClient, TmdbSettings tmdbSettings)
+        public MovieRepository(ApplicationDbContext context)
         {
             _context = context;
-            _httpClient = httpClient;
-            _settings = tmdbSettings;
         }
 
         public async Task UpdateMoviesAsync(IEnumerable<Movie> moviesFromApi)

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using MovieApp.Manager;
 using MovieApp.Repositories;
+using MovieApp.Interfaces;
 namespace MovieApp.Controllers
 {
     public class ReviewController : Controller
@@ -14,8 +15,8 @@ namespace MovieApp.Controllers
         private readonly MovieService _movieService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationUserManager _applicationUserManager;
-        private readonly ReviewRepository _reviewRepository;
-        public ReviewController(MovieService movieService, UserManager<ApplicationUser> userManager, ApplicationUserManager applicationUserManager, ReviewRepository reviewRepository)
+        private readonly IReviewRepository _reviewRepository;
+        public ReviewController(MovieService movieService, UserManager<ApplicationUser> userManager, ApplicationUserManager applicationUserManager, IReviewRepository reviewRepository)
         {
             _movieService = movieService;
             _userManager = userManager;

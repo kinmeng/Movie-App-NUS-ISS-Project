@@ -14,8 +14,8 @@ namespace MovieApp.Services
 
         private readonly HttpClient _httpClient;
         private readonly TmdbSettings _settings;
-        private readonly MovieRepository _repository;
-        public MovieService(HttpClient httpClient, IOptions<TmdbSettings> settings, MovieRepository movieRepository)
+        private readonly IMovieRepository _repository;
+        public MovieService(HttpClient httpClient, IOptions<TmdbSettings> settings, IMovieRepository movieRepository)
         {
             _httpClient = httpClient;
             _settings = settings.Value;

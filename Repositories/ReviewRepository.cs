@@ -1,19 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Data;
+using MovieApp.Interfaces;
 using MovieApp.Models;
 
 namespace MovieApp.Repositories
 {
-    public interface IReviewRepository
-    {
-        Task<List<Review>> GetReviewsByMovieId(int movieId);
-        Task<Review?> GetReviewByIdAsync(int id);
-        Task AddReviewAsync(Review review);
-        Task EditReviewAsync(Review review);
-        Task RemoveReviewAsync(int id);
-        bool ReviewExists(int id);
-    }
 
     public class ReviewRepository: IReviewRepository
     {
