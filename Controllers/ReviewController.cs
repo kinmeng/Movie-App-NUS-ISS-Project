@@ -6,21 +6,20 @@ using MovieApp.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using MovieApp.Manager;
-using MovieApp.Repositories;
 namespace MovieApp.Controllers
 {
     public class ReviewController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly MovieService _movieService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationUserManager _applicationUserManager;
-        private readonly ReviewRepository _reviewRepository;
-        public ReviewController(MovieService movieService, UserManager<ApplicationUser> userManager, ApplicationUserManager applicationUserManager, ReviewRepository reviewRepository)
+        public ReviewController(ApplicationDbContext context, MovieService movieService, UserManager<ApplicationUser> userManager, ApplicationUserManager applicationUserManager)
         {
+            _context = context;
             _movieService = movieService;
             _userManager = userManager;
             _applicationUserManager = applicationUserManager;
-            _reviewRepository = reviewRepository;
         }
 
         // GET: Review/ViewReviews/5
@@ -32,7 +31,9 @@ namespace MovieApp.Controllers
             ViewData["PreferredName"] = preferredName;
 
             var movie = await _movieService.GetMovieByIdAsync(movieId);
-            var reviews = await _reviewRepository.GetReviewsByMovieId(movieId);
+            var reviews = await _context.Reviews
+                .Where(r => r.MovieId == movieId)
+                .ToListAsync();
 
             var viewModel = new MovieReviewsViewModel
             {
@@ -72,7 +73,8 @@ namespace MovieApp.Controllers
 
             if (ModelState.IsValid)
             {
-                await _reviewRepository.AddReviewAsync(review);
+                _context.Add(review);
+                await _context.SaveChangesAsync();
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
                     return PartialView("_submitReview", review); // Return partial view for AJAX
@@ -99,7 +101,7 @@ namespace MovieApp.Controllers
             var preferredName = await _applicationUserManager.GetPreferredNameAsync(user);
 
             ViewData["PreferredName"] = preferredName;
-            var review = await _reviewRepository.GetReviewByIdAsync(id);
+            var review = await _context.Reviews.FindAsync(id);
             if (review == null)
             {
                 return NotFound();
@@ -127,11 +129,12 @@ namespace MovieApp.Controllers
             {
                 try
                 {
-                    await _reviewRepository.EditReviewAsync(review);
+                    _context.Update(review);
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_reviewRepository.ReviewExists(review.Id))
+                    if (!ReviewExists(review.Id))
                     {
                         return NotFound();
                     }
@@ -149,9 +152,8 @@ namespace MovieApp.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> Delete(int id)
         {
-            //var review = await _context.Reviews
-            //    .FirstOrDefaultAsync(m => m.Id == id);
-            var review = await _reviewRepository.GetReviewByIdAsync(id);
+            var review = await _context.Reviews
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {
                 return NotFound();
@@ -165,11 +167,15 @@ namespace MovieApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var review = await _reviewRepository.GetReviewByIdAsync(id);
-            await _reviewRepository.RemoveReviewAsync(id);
-            return RedirectToAction("ViewReviews", new { movieId = review?.MovieId });
+            var review = await _context.Reviews.FindAsync(id);
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ViewReviews", new { movieId = review.MovieId });
         }
 
-        
+        private bool ReviewExists(int id)
+        {
+            return _context.Reviews.Any(e => e.Id == id);
+        }
     }
 }

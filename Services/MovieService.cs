@@ -5,7 +5,6 @@ using MovieApp.Models;
 using Microsoft.EntityFrameworkCore;
 using MovieApp.Data;
 using MovieApp.Interfaces;
-using MovieApp.Repositories;
 
 namespace MovieApp.Services
 {
@@ -14,12 +13,12 @@ namespace MovieApp.Services
 
         private readonly HttpClient _httpClient;
         private readonly TmdbSettings _settings;
-        private readonly MovieRepository _repository;
-        public MovieService(HttpClient httpClient, IOptions<TmdbSettings> settings, MovieRepository movieRepository)
+        private readonly ApplicationDbContext _context;
+        public MovieService(HttpClient httpClient, IOptions<TmdbSettings> settings, ApplicationDbContext context)
         {
             _httpClient = httpClient;
             _settings = settings.Value;
-            _repository = movieRepository;
+            _context = context;
         }
 
         public async Task<IEnumerable<Movie>> GetMoviesAsync()
@@ -29,19 +28,46 @@ namespace MovieApp.Services
 
             var responseBody = await response.Content.ReadAsStringAsync();
             var movieResponse = JsonSerializer.Deserialize<MovieResponse>(responseBody);
-            return movieResponse?.results ?? [];
+            return movieResponse.results;
         }
 
         public async Task UpdateMoviesAsync()
         {
             var moviesFromApi = await GetMoviesAsync();
 
-            await _repository.UpdateMoviesAsync(moviesFromApi);
-        }
+            var apiMovieIds = moviesFromApi.Select(m => m.MovieId).ToList();
+            var existingMovies = await _context.Movies
+                                               .Where(m => apiMovieIds.Contains(m.MovieId))
+                                               .ToListAsync();
 
+            var newMovies = moviesFromApi.Where(apiMovie => !existingMovies.Any(dbMovie => dbMovie.MovieId == apiMovie.MovieId)).ToList();
+
+
+            //foreach (var movie in newMovies)
+            //{
+            //    // Ensure the Id is not set explicitly
+            //    movie.Id = 0;
+            //}
+
+            if (newMovies.Any())
+            {
+                await _context.Movies.AddRangeAsync(newMovies);
+                await _context.SaveChangesAsync();
+            }
+        }
         public async Task<Movie> GetMovieByIdAsync(int movieId)
         {
-            return await _repository.GetMovieByIdAsync(movieId);
+            
+            var movie= await _context.Movies.FirstOrDefaultAsync(m => m.MovieId == movieId);
+            if (movie == null)
+            {
+                return null;
+            }
+
+            else
+            {
+                return movie;
+            }
         }
 
         public async Task<IEnumerable<Movie>> SearchMoviesAsync(ISearchStrategy searchStrategy, string searchString)
