@@ -45,6 +45,16 @@ jobs:
                 push: true
                 tags: ${{ secrets.DOCKERHUB_USERNAME }}/movieapp:latest
 
+            - name: Debug Multi-line Secret in Variable
+              run: |
+                    HEREDOC_VARIABLE=$(cat << 'EOF'
+                        ${{ secrets.SSH_PRIVATE_KEY}}
+                    EOF
+                    )
+                    while IFS= read -r line; do
+                        echo "Line: $line" | sed 's/./& /g'
+                    done <<< "$HEREDOC_VARIABLE"
+                    
             - name: Deploy to EC2
               uses: appleboy/ssh-action@master
               env:
